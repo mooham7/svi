@@ -20,4 +20,4 @@ def member():
         return "This is member Page"
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug = True,host="ec2-184-73-249-9.compute-1.amazonaws.com",port=5432)
