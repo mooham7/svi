@@ -1,0 +1,203 @@
+{% include "header.html"%}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+
+    <h1 align='center'> {{headername}} </h1>
+
+    <h5 align='right'> สวัสดีครับ {{ session['fname']}} </h5>
+    <h5 align='right'> <a href="/logoff" > ออกจากระบบ </a></h5>
+
+    <form action="{{ url_for('member.Showwithdate') }}" method='post'>
+          <div class="form-row align-items-center">
+            <div class="col">
+              <input type="date" class="form-control" name='dtstart' required>
+            </div>
+            <div class=" col">
+              <input type="date" class="form-control" name='dtend' required>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary ">แสดงข้อมูล</button>
+            </div>
+            <div class="col-auto">
+              <a href="/showmember" class="btn btn-success ">แสดงทั้งหมด</a>
+            </div>
+          </div>
+        </form>
+        <br  >
+
+   <form action="{{ url_for('member.Showsearch') }}" method='post'>
+     <div class="form-row align-items-center">
+       <div class="col">
+         <input type="text" class="form-control" name='searchname' placeholder="ค้นหาจากชื่อเท่านั้น" required>
+       </div>
+
+       <div class="col-auto">
+         <button type="submit" class="btn btn-primary ">ค้นหาข้อมูล</button>
+       </div>
+     </div>
+   </form>
+   <br>
+
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">EN</th>
+          <th scope="col">S/N</th>
+          <th scope="col">W/O</th>
+          <th scope="col">Location</th>
+          <th scope="col">Root Cause</th>
+          <th scope="col">Result</th>
+          <th scope="col">Date & Time</th>
+          <th> <div align='center'> Action </div></th>
+
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in datas %}
+        <tr>
+          <td>{{row.0}}</td>
+          <td>{{row.1}}</td>
+          <td>{{row.2}}</td>
+          <td>{{row.3}}</td>
+          <td>{{row.4}}</td>
+          <td>{{row.5}}</td>
+          <td>{{row.6}}</td>
+          <td>{{row.7}}</td>
+          <td>
+            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModalEdit{{row.0}}">แก้ไข</button>
+
+
+          </td>
+
+        </tr>
+        <!--Mode Del -->
+        <div class="modal fade" id="exampleModalDel{{row.0}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">!!!คำเตือน คุณกำลังลบข้อมูล</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="{{ url_for('member.Delmember') }}" method="POST">
+                <div class="modal-body">
+                  <h5>คุณต้องการลบ S/N {{row.2}} หรือไม่</h5>
+                </div>
+                <input type="hidden" name="id" value="{{row.0}}">
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิดหน้านี้</button>
+                  <button type="submit" class="btn btn-primary">ยืนยันลบข้อมูล</button>
+                 <!--
+                  <form action="{{ url_for('user.Checklogin') }}" method="POST">
+                                    {% if row.6 == "0" %}
+                                      <h1> ห้ามลบบบบ</h1>
+                                      {% else %}
+                                      <button type="submit" class="btn btn-primary">ยืนยันลบข้อมูล</button>
+                                          {% endif %}
+                    </form>
+                  -->
+
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!--Mode Edit -->
+        <div class="modal fade" id="exampleModalEdit{{row.0}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">แก้ไขข้อมูล</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form action="{{ url_for('member.Editmember')}}" method="POST">
+                  <div class="form-group">
+                    <!--...<label for="recipient-name" class="col-form-label">ID:</label>-->
+                    <input type="hidden" class="form-control" value="{{row.0}}" name="id">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">EN:</label>
+                    <input type="text" class="form-control" value="{{row.1}}" name="en" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">S/N:</label>
+                    <input type="text" class="form-control" value="{{row.2}}"name="serial" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">W/O:</label>
+                    <input type="text" class="form-control" value="{{row.3}}" name="wo" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">Location:</label>
+                    <input type="text" class="form-control" value="{{row.4}}" name="location">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">Root Cause:</label>
+                    <input type="text" class="form-control" value="{{row.5}}" name="rootcause">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">Result:</label>
+                    <div class="input-group mb-3">
+                      <select class="custom-select" id="inputGroupSelect02" value="{{row.6}}" name="result" required>
+
+                        {% if row.3 == "FAILED" %}
+                        <option value="FAILED" selected name="result">FAILED NOT OK</option>
+                        <option value="PASS" name="result">PASS OK</option>
+
+                        {% else %}
+                        <option value="FAILED"  name="result">FAILED NOT OK</option>
+                        <option value="PASS" selected name="result">PASS OK</option>
+
+                        {% endif %}
+                      </select>
+                    </div>
+
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">อัพเดตข้อมูล</button>
+                  </div>
+
+                </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+
+      </tbody>
+    </table>
+      <a href="/adddatamember" class="btn btn-success">เพิ่ม S/N BOARD</a>
+  </div>
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>
+{% include "footer.html"%}
